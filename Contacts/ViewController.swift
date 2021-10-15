@@ -9,8 +9,39 @@ import UIKit
 
 class ViewController: UIViewController {
     
-   
-    private var contacts = [ContactProtocol]()
+    @IBOutlet var tableView: UITableView!
+    @IBAction func showNewContactAllert() {
+        let aletrController = UIAlertController(title: "Создать новый контакт", message: "Введите имя и телефон", preferredStyle: .alert)
+        aletrController.addTextField { textField in
+            textField.placeholder = "Имя"
+        }
+        aletrController.addTextField { textField in
+            textField.placeholder = "Номер телефона"
+        }
+        let createButton = UIAlertAction(title: "Создать", style: .default) {
+            _ in
+            guard let contactName = aletrController.textFields?[0].text,
+            let contactPhone = aletrController.textFields?[1].text else {
+                return
+            }
+            let contact = Contact(title: contactName, phone: contactPhone)
+            self.contacts.append(contact)
+            self.tableView.reloadData()
+        }
+        let cancelButton = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
+        aletrController.addAction(cancelButton)
+        aletrController.addAction(createButton)
+        
+        self.present(aletrController, animated: true, completion: nil)
+        
+    }
+    
+    
+    private var contacts: [ContactProtocol] = [] {
+        didSet {
+            contacts.sort{ $0.title < $1.title }
+        }
+    }
     
     private func loadContacts() {
         contacts.append(
@@ -19,7 +50,7 @@ class ViewController: UIViewController {
             Contact(title: "Владимир Анатольевич", phone: "+375259990002"))
         contacts.append(
             Contact(title: "Сильвестр", phone: "+375254325500"))
-        contacts.sort{ $0.title < $1.title }
+        
         
     }
 
